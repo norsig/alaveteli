@@ -2,6 +2,8 @@
 
 ## Highlighted Features
 
+* Add a footer to the Admin layout with useful links to alaveteli.org (Gareth
+  Rees)
 * Fix bug in `stats:show` task (Liz Conlan, Gareth Rees)
 * Use `.eml` file extension when downloading raw emails through the admin
   interface (Gareth Rees)

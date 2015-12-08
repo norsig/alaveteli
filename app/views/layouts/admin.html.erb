@@ -21,8 +21,7 @@
               <%= render_flash(flash[:error]) %>
             </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
 
       <% if flash[:notice] %>
         <div class="row">
@@ -31,10 +30,30 @@
               <%= render_flash(flash[:notice]) %>
             </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
 
-      <%= yield  %>
-    </div>
+        <%= yield  %>
+      </div>
+
+      <div class="admin-footer">
+        <div class="container">
+          <div class="row">
+            <span class="span4 offset8">
+              <ul class="nav nav-pills">
+                <li>
+                  <a href="http://alaveteli.org/docs/running/admin_manual/">
+                    Admin Manual
+                  </a>
+                </li>
+                <li>
+                  <a href="http://alaveteli.org/community/">
+                    Alaveteli Community
+                  </a>
+                </li>
+              </ul>
+            </span>
+          </div>
+        </div>
+      </div>
   </body>
 </html>
