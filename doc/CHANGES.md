@@ -18,6 +18,8 @@
   (Louise Crow)
 
 ## Upgrade Notes
+
+* We've removed the spring preloader as it didn't seem to provide much benefit.
 * This release removes the use of purge requests to Varnish. Please make sure
   your site works with `VARNISH_HOST` empty before upgrading.
 
