@@ -1,5 +1,6 @@
 # -*- encoding : utf-8 -*-
 require 'spec_helper'
+require 'stripe_mock'
 require File.expand_path(File.dirname(__FILE__) + '/../alaveteli_dsl')
 
 def start_batch_request
@@ -43,13 +44,6 @@ def search_results
 end
 
 describe "creating batch requests in alaveteli_pro" do
-  let(:pro_user) do
-    user = FactoryGirl.create(:pro_user)
-    AlaveteliFeatures.backend.enable_actor(:pro_batch_access, user)
-    user
-  end
-
-  let!(:pro_user_session) { login(pro_user) }
   let!(:authorities) { FactoryGirl.create_list(:public_body, 26) }
 
   before :all do
@@ -57,6 +51,7 @@ describe "creating batch requests in alaveteli_pro" do
   end
 
   before do
+    StripeMock.start
     update_xapian_index
   end
 
@@ -65,7 +60,34 @@ describe "creating batch requests in alaveteli_pro" do
       authority.destroy
     end
     update_xapian_index
+    StripeMock.stop
   end
+
+  let(:stripe_helper) { StripeMock.create_test_helper }
+  let(:plan) { stripe_helper.create_plan(id: 'pro', amount: 1000) }
+
+  let(:customer) do
+    Stripe::Customer.create(
+      email: FactoryGirl.build(:user).email,
+      source: stripe_helper.generate_card_token
+    )
+  end
+
+  let(:subscription) do
+    Stripe::Subscription.create(customer: customer, plan: plan.id)
+  end
+
+  let(:pro_user) do
+    user = FactoryGirl.create(:pro_user)
+    AlaveteliFeatures.backend.enable_actor(:pro_batch_access, user)
+    FactoryGirl.create(:pro_account,
+                       user: user,
+                       stripe_customer_id: customer.id,
+                       monthly_batch_limit: 25)
+    user
+  end
+
+  let!(:pro_user_session) { login(pro_user) }
 
   it "allows the user to build a list of authorities" do
     using_pro_session(pro_user_session) do
