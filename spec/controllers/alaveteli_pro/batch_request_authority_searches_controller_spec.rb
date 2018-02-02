@@ -28,9 +28,19 @@ shared_examples_for "creating a search" do
 end
 
 describe AlaveteliPro::BatchRequestAuthoritySearchesController do
+
+  before do
+    StripeMock.start
+  end
+
+  after do
+    StripeMock.stop
+  end
+
   let(:pro_user) do
     user = FactoryGirl.create(:pro_user)
     AlaveteliFeatures.backend.enable_actor(:pro_batch_access, user)
+    FactoryGirl.create(:pro_account, user: user, monthly_batch_limit: 99)
     user
   end
 
