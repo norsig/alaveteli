@@ -1,6 +1,5 @@
 # -*- encoding : utf-8 -*-
 require 'spec_helper'
-require 'stripe_mock'
 require File.expand_path(File.dirname(__FILE__) + '/../alaveteli_dsl')
 
 def start_batch_request
@@ -51,7 +50,6 @@ describe "creating batch requests in alaveteli_pro" do
   end
 
   before do
-    StripeMock.start
     update_xapian_index
   end
 
@@ -60,21 +58,6 @@ describe "creating batch requests in alaveteli_pro" do
       authority.destroy
     end
     update_xapian_index
-    StripeMock.stop
-  end
-
-  let(:stripe_helper) { StripeMock.create_test_helper }
-  let(:plan) { stripe_helper.create_plan(id: 'pro', amount: 1000) }
-
-  let(:customer) do
-    Stripe::Customer.create(
-      email: FactoryGirl.build(:user).email,
-      source: stripe_helper.generate_card_token
-    )
-  end
-
-  let(:subscription) do
-    Stripe::Subscription.create(customer: customer, plan: plan.id)
   end
 
   let(:pro_user) do
@@ -82,7 +65,7 @@ describe "creating batch requests in alaveteli_pro" do
     AlaveteliFeatures.backend.enable_actor(:pro_batch_access, user)
     FactoryGirl.create(:pro_account,
                        user: user,
-                       stripe_customer_id: customer.id,
+                       stripe_customer_id: 'test_customer',
                        monthly_batch_limit: 25)
     user
   end
